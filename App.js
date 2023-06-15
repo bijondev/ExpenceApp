@@ -7,18 +7,29 @@ import RecentExpenses from "./screens/RecentExpenses";
 import AllExpenses from "./screens/AllExpenses";
 import { GlobalStyles } from "./constants/styles";
 import {Ionicons} from '@expo/vector-icons';
+import IconButton from "./components/UI/IconButton";
 
 const Stack = createNativeStackNavigator();
 const BottoTabs = createBottomTabNavigator();
 
 function ExpepensesOverview() {
   return (
-    <BottoTabs.Navigator screenOptions={{
+    <BottoTabs.Navigator screenOptions={({navigation}) =>({
+      
       headerStyle:{backgroundColor: GlobalStyles.colors.primary500},
       headerTintColor: 'white',
       tabBarStyle: {backgroundColor: GlobalStyles.colors.primary500},
-      tabBarActiveTintColor: GlobalStyles.colors.accent500
-    }}>
+      tabBarActiveTintColor: GlobalStyles.colors.accent500,
+      headerRight: ({ tintColor })=> 
+      <IconButton 
+      icon="add" 
+      size={24} 
+      color={tintColor} 
+      onPress={() => {
+        navigation.navigate('ManageExpenses');
+      } } />
+    
+    })}>
       <BottoTabs.Screen
       options={{
         title: 'Recent Expenses',
@@ -46,7 +57,16 @@ export default function App() {
     <>
       <StatusBar style="auto" />
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator
+        screenOptions={{
+      
+      headerStyle:{backgroundColor: GlobalStyles.colors.primary500},
+      headerTintColor: 'white',
+      tabBarStyle: {backgroundColor: GlobalStyles.colors.primary500},
+      tabBarActiveTintColor: GlobalStyles.colors.accent500,
+
+    
+    }}>
           <Stack.Screen
             options={{
               headerShown: false,
@@ -54,7 +74,8 @@ export default function App() {
             name="ExpensesOverview"
             component={ExpepensesOverview}
           />
-          <Stack.Screen name="ManageExpenses" component={ManageExpenses} />
+          <Stack.Screen name="ManageExpenses" component={ManageExpenses}
+          options={{ presentation: 'modal'}} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
