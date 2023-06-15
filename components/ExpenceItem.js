@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import { GlobalStyles } from "../constants/styles";
 import { getFormatedDate } from "../util/date";
 
-function ExpenceItem({ id, description, amount, data }) {
+function ExpenceItem({ id, description, amount, date }) {
   const navigation = useNavigation();
 
   function expensesPresshandeler() {
@@ -18,7 +18,7 @@ function ExpenceItem({ id, description, amount, data }) {
           <Text style={[styles.txtBase, styles.description]}>
             {description}
           </Text>
-          <Text style={styles.txtBase}>{getFormatedDate(data)}</Text>
+          <Text style={styles.txtBase}>{getFormatedDate(date)}</Text>
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>{amount}</Text>
