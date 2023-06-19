@@ -74,8 +74,8 @@ function expensesReduicer(state, action){
     switch(action.type){
         case 'ADD':
             const id = parseInt(new Date / 1000).toString();
-            console.log("-----------------------");
-            console.log({...action.payload});
+            // console.log("-----------------------");
+            // console.log({...action.payload});
             return [{...action.payload, id:id }, ...state];
 
 
