@@ -1,13 +1,19 @@
-import { useContext, useLayoutEffect } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import { Text, View, StyleSheet } from "react-native";
 import ExpenseForm from "../components/ManageExpense/ExpenseForm";
 import Button from "../components/UI/Button";
 import IconButton from "../components/UI/IconButton";
+import LoadingOverlay from "../components/UI/LoadingOverlay";
 import { GlobalStyles } from "../constants/styles";
 import { expenceContext } from "../store/expense-context";
+import { storeExpense, updateExpenseHttp, deleteExpense } from "../util/http";
 
 function ManageExpenses({ route, navigation }) {
+  const [isSubbimitting, setIsSubbmitting] = useState(false);
+  const [error, setError] = useState();
+
   const expenseCTX = useContext(expenceContext);
+
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
 
@@ -22,19 +28,61 @@ function ManageExpenses({ route, navigation }) {
   }, [navigation, isEditing]);
 
   function deleteExpenseHandeler() {
-    expenseCTX.deleteExpense(editedExpenseId);
+    setIsSubbmitting(true);
+
+    try {
+      deleteExpense(editedExpenseId);
+      expenseCTX.deleteExpense(editedExpenseId);
+    } catch (error) {
+      setIsSubbmitting(false);
+      setError("Could not delete expenses!");
+    }
+
     navigation.goBack();
   }
+
   function cancelhandeler() {
     navigation.goBack();
   }
-  function confirmhandeler(expencesData) {
+
+  async function confirmhandeler(expencesData) {
     if (isEditing) {
-      expenseCTX.updateExpense(editedExpenseId, expencesData);
+      // console.log(expencesData);
+      // console.log(editedExpenseId);
+      setIsSubbmitting(true);
+
+      try {
+        expenseCTX.updateExpense(editedExpenseId, expencesData);
+        await updateExpenseHttp(editedExpenseId, expencesData);
+      } catch (error) {
+        setIsSubbmitting(false);
+        setError("Could not update expenses!");
+      }
     } else {
-      expenseCTX.addExpense(expencesData);
+      setIsSubbmitting(true);
+
+      try {
+        const id = await storeExpense(expencesData);
+        // console.log(">>>>>>>>>>>>>>>>>>>>>>>>" + id);
+        expenseCTX.addExpense({ ...expencesData, id: id });
+      } catch (error) {
+        setIsSubbmitting(false);
+        setError("Could not Add Expense!");
+      }
     }
     navigation.goBack();
+  }
+
+  function errorHandeler() {
+    setError(null);
+  }
+
+  if (error && !isSubbimitting) {
+    return <ErrorOverlay message={error} onConfirm={errorhandeler} />;
+  }
+
+  if (isSubbimitting) {
+    return <LoadingOverlay />;
   }
 
   return (
